@@ -21,7 +21,7 @@ class WorkReportModel(BaseModel):
 
     __tablename__ = "work_reports"
 
-    id: Mapped[int] = mapped_column(primary_key=True, auto_increment=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     work_date: Mapped[date] = mapped_column(Date, info={"tip": "Report will be saved for this day"})
     day_type: Mapped[WorkingDayType] = mapped_column(EnumType(WorkingDayType))
     hours_worked: Mapped[int] = mapped_column(Integer)
