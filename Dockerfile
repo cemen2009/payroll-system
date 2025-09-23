@@ -13,10 +13,9 @@ RUN apk add --no-cache \
 
 WORKDIR /usr/src/poetry
 
-COPY ./poetry.lock ./pyproject.toml ./
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-root --only main
+COPY ./uv.lock ./pyproject.toml ./
+RUN pip install uv &&  \
+    uv pip install --system --no-cache .
 
 # Final Image
 FROM python:3.13-alpine
