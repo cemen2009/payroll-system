@@ -2,14 +2,18 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
+from schemas.employee import EmployeeListItemSchema
+
 
 class PositionBaseSchema(BaseModel):
-    name: str
+    title: str
     rate: Decimal
+    employees: list[EmployeeListItemSchema]
 
 
 class PositionDetailResponseModel(PositionBaseSchema):
     id: int
+    employees: list[EmployeeListItemSchema]
 
 
 class PositionListResponseSchema(BaseModel):
