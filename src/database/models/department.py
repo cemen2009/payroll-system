@@ -25,5 +25,5 @@ class DepartmentModel(BaseModel):
         foreign_keys="EmployeeModel.department_id"
     )
 
-    def __repr__(self):
-        return f"<Department #{self.code}>"
+    def __repr__(self) -> str:
+        return f"<Department {self.name} (#{self.code})>"

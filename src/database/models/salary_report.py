@@ -6,6 +6,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from database.models.base import BaseModel
 
+
 class SalaryReportModel(BaseModel):
     __tablename__ = "salary_reports"
 

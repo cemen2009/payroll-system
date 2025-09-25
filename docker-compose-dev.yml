@@ -4,35 +4,66 @@ services:
     build: .
     container_name: backend_online_cinema
     command: ["/bin/bash", "/commands/run_web_server_dev.sh"]
-#    env_file:
-#      - .env  # TODO: create .env and .env.example
+    env_file:
+      - .env
     environment:
       - LOG_LEVEL=debug
       - PYTHONPATH=/usr/src/fastapi
       - WATCHFILES_FORCE_POLLING=true
     ports:
       - "8000:8000"
-
-#   TODO: uncomment when db and minio services are written
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#      minio:
-#        condition: service_healthy
+    depends_on:
+      db:
+        condition: service_healthy
 
     volumes:
       - ./src:/usr/src/fastapi
     networks:
-      - online_cinema_network
+      - payroll_system_network
 
-#volumes:
-#  pgadmin_online_cinema_data:
-#    driver: local
-#  minio_data:
-#    driver: local
-#  redis_data:
-#    driver: local
+  db:
+    image: "postgres:latest"
+    container_name: postgres_payroll_system
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      # all .sh and .sql files in docker-entrypoint-initdb.d will be executed at first time when volume was created
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_payroll_system_data:/var/lib/postgresql/data/
+    networks:
+      - payroll_system_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h 127.0.0.1 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_payroll_system
+    ports:
+      - "3333:80"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pgadmin_payroll_system_data:/var/lib/pgadmin
+    networks:
+      - payroll_system_network
+
+
+volumes:
+  postgres_payroll_system_data:
+    driver: local
+  pgadmin_payroll_system_data:
+    driver: local
+
 
 networks:
-  online_cinema_network:
+  payroll_system_network:
     driver: bridge
