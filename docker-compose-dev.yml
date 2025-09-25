@@ -2,7 +2,7 @@ services:
   web:
     restart: always
     build: .
-    container_name: backend_online_cinema
+    container_name: backend_payroll_system
     command: ["/bin/bash", "/commands/run_web_server_dev.sh"]
     env_file:
       - .env

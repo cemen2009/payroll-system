@@ -15,5 +15,9 @@ class PositionModel(BaseModel):
 
     employees: Mapped[list["EmployeeModel"]] = relationship("EmployeeModel", back_populates="position")
 
+    @classmethod
+    def default_order_by(cls):
+        return [cls.title.desc()]
+
     def __repr__(self) -> str:
         return f"<Position {self.title} [${self.rate}/hour]>"

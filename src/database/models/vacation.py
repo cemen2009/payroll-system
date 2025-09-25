@@ -1,9 +1,14 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from database.models.base import BaseModel
+
+
+if TYPE_CHECKING:
+    from database.models.employee import EmployeeModel
 
 
 class VacationModel(BaseModel):
@@ -14,7 +19,7 @@ class VacationModel(BaseModel):
     end_date: Mapped[date] = mapped_column(Date)
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
-    employee: Mapped["EmployeeModel"] = relationship("EmployeeModel", back_populates="vacations", foreign_keys=[employee_id])
+    employee: Mapped["EmployeeModel"] = relationship("EmployeeModel", back_populates="vacations")
 
     @property
     def duration(self):

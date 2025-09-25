@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Depends, Path, Body, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Query, Depends, Path, Body, HTTPException, Request
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +10,9 @@ from starlette import status
 from database.models import PositionModel
 from schemas import (
     PositionListResponseSchema,
-    PositionDetailResponseModel,
-    PositionCreateSchema
+    PositionDetailResponseSchema,
+    PositionCreateSchema,
+    PositionListItemSchema
 )
 from database import get_db
 
@@ -21,30 +22,81 @@ router = APIRouter()
 
 @router.get(
     "/positions/",
-    response_model=list[PositionListResponseSchema],
+    response_model=PositionListResponseSchema,
+    summary="Get all positions from the database"
 )
 async def get_position_list(
+        request: Request,
         page: Annotated[int, Query(ge=1, description="Page number (1-based index)")] = 1,
         per_page: Annotated[int, Query(ge=1, le=20, description="Number of items per page")] = 10,
         db: AsyncSession = Depends(get_db)
 ):
-    ...
+    offset = (page - 1) * per_page
+
+    count_stmt = select(func.count(PositionModel.id))
+    result_count = await db.execute(count_stmt)
+    total_items = result_count.scalar() or 0
+
+    if not total_items:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No positions was found."
+        )
+
+    order_by: list = PositionModel.default_order_by() # a list with ordering settings for model
+    stmt = select(PositionModel)
+
+    if order_by:
+        # apply default_order_by only if it's overridden (from BaseModel it contains only [None])
+        stmt = stmt.order_by(*order_by)
+
+    stmt = stmt.offset(offset).limit(per_page)
+
+    result_positions = await db.execute(stmt)
+    positions = result_positions.scalars().all()
+
+    if not positions:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No positions was found."
+        )
+
+    positions_list = [PositionListItemSchema.model_validate(position) for position in positions]
+
+    total_pages = (total_items + per_page - 1) // per_page
+
+    url_path = request.url
+    query_base = f"{url_path}?per_page={per_page}"
+
+    prev_page = f"{query_base}&page={page - 1}" if page > 1 else None
+    next_page = f"{query_base}&page={page + 1}" if page < total_pages else None
+
+    response = PositionListResponseSchema(
+        positions=positions_list,
+        previous_page=prev_page,
+        next_page=next_page,
+        total_positions=total_items,
+        total_pages=total_pages
+    )
+
+    return response
 
 
-@router.get(
-    "/positions/{position_id}/",
-    response_model=PositionDetailResponseModel
-)
-async def get_position_detail(
-        position_id: Annotated[int, Path()],
-        db: AsyncSession = Depends(get_db)
-):
-    ...
+# @router.get(
+#     "/positions/{position_id}/",
+#     response_model=PositionDetailResponseSchema
+# )
+# async def get_position_detail(
+#         position_id: Annotated[int, Path()],
+#         db: AsyncSession = Depends(get_db)
+# ):
+#     ...
 
 
 @router.post(
     "/positions/",
-    response_model=PositionDetailResponseModel
+    response_model=PositionDetailResponseSchema,
+    summary="Create new position with rate ($/hour) and save it into the database"
 )
 async def create_position(
         data: Annotated[PositionCreateSchema, Body()],
@@ -52,7 +104,7 @@ async def create_position(
 ):
     existing_stmt = select(PositionModel).where(PositionModel.title == data.title)
     existing_result = await db.execute(existing_stmt)
-    existing_position = existing_result.scalars().first()
+    existing_position = existing_result.scalar_one_or_none()
 
     if existing_position:
         raise HTTPException(
@@ -61,21 +113,16 @@ async def create_position(
         )
 
     try:
-        position = PositionModel(
-            title=data.title,
-            rate=data.rate,
-            employees=data.employees,
-        )
+        new_position = PositionModel(**data.model_dump())
 
-        db.add(employee)
+        db.add(new_position)
         await db.commit()
-        await db.refresh(position, ["employees"])
+        await db.refresh(new_position, ["employees"])
 
-        return Position
-
+        return new_position
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid input data."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Wrong input data."
         )

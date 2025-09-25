@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from schemas.employee import EmployeeListItemSchema
 
@@ -8,18 +8,23 @@ from schemas.employee import EmployeeListItemSchema
 class PositionBaseSchema(BaseModel):
     title: str
     rate: Decimal
-    employees: list[EmployeeListItemSchema]
 
 
-class PositionDetailResponseModel(PositionBaseSchema):
+class PositionDetailResponseSchema(PositionBaseSchema):
     id: int
     employees: list[EmployeeListItemSchema]
 
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PositionListItemSchema(PositionBaseSchema):
+    model_config = ConfigDict(from_attributes=True)
+
 
 class PositionListResponseSchema(BaseModel):
-    positions: list[PositionDetailResponseModel]
-    previous_page: str
-    next_page: str
+    positions: list[PositionListItemSchema]
+    previous_page: str | None
+    next_page: str | None
     total_positions: int
     total_pages: int
 

@@ -1,6 +1,8 @@
-from schemas.position  import (
+from schemas.position import (
     PositionListResponseSchema,
-    PositionDetailResponseModel,
+    PositionDetailResponseSchema,
     PositionCreateSchema,
-    PositionUpdateSchema
+    PositionUpdateSchema,
+    PositionListItemSchema,
+    PositionListItemSchema
 )

@@ -1,6 +1,5 @@
 import os
 
-import database.models
 
 environment = os.getenv("ENVIRONMENT", "developing")
 
