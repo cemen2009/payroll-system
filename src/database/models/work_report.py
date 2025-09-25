@@ -22,9 +22,16 @@ class WorkReportModel(BaseModel):
     __tablename__ = "work_reports"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    work_date: Mapped[date] = mapped_column(Date, info={"tip": "Report will be saved for this day"})
+    work_date: Mapped[date] = mapped_column(
+        Date, info={"tip": "Report will be saved for this day"}
+    )
     day_type: Mapped[WorkingDayType] = mapped_column(EnumType(WorkingDayType))
     hours_worked: Mapped[int] = mapped_column(Integer)
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
-    employee: Mapped["EmployeeModel"] = relationship(back_populates="work_reports", foreign_keys=[employee_id])
+    employee: Mapped["EmployeeModel"] = relationship(
+        "EmployeeModel", back_populates="work_reports", foreign_keys=[employee_id]
+    )
+
+    def __repr__(self):
+        return f"<Work Report of {self.employee} for {self.work_date}>"

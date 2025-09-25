@@ -13,7 +13,7 @@ class PositionModel(BaseModel):
     title: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     rate: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False, info={"tip": "Rate of an employee per hour"})
 
-    employees: Mapped[list["EmployeeModel"]] = relationship(back_populates="position")
+    employees: Mapped[list["EmployeeModel"]] = relationship("EmployeeModel", back_populates="position")
 
     def __repr__(self) -> str:
-        return f"<Position {self.title}>"
+        return f"<Position {self.title} [${self.rate}/hour]>"

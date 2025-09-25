@@ -6,6 +6,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from database.models.base import BaseModel
 
+
 class SalaryReportModel(BaseModel):
     __tablename__ = "salary_reports"
 
@@ -22,3 +23,6 @@ class SalaryReportModel(BaseModel):
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
     employee: Mapped["EmployeeModel"] = relationship(back_populates="salary_reports", foreign_keys=[employee_id])
+
+    def __repr__(self):
+        return f"<Salary Report of {self.employee} for {self.month}>"
