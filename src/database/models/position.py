@@ -12,3 +12,6 @@ class PositionModel(BaseModel):
     rate: Mapped[float] = mapped_column(Float, nullable=False, info={"tip": "Rate of an employee per hour"})
 
     employees: Mapped[list["EmployeeModel"]] = relationship(back_populates="position")
+
+    def __repr__(self):
+        return f"<Position {self.title} [${self.rate}/hour]>"

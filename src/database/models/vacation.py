@@ -1,0 +1,24 @@
+from datetime import date
+
+from sqlalchemy import Date, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped, relationship
+
+from database.models.base import BaseModel
+
+
+class VacationModel(BaseModel):
+    __tablename__ = "vacations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    start_date: Mapped[date] = mapped_column(Date)
+    end_date: Mapped[date] = mapped_column(Date)
+
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
+    employee: Mapped["EmployeeModel"] = relationship("EmployeeModel", back_populates="vacations", foreign_keys=[employee_id])
+
+    @property
+    def duration(self):
+        return self.end_date - self.start_date
+
+    def __repr__(self):
+        return f"<Vacation for {self.employee} [{self.duration} days]>"

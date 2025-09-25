@@ -22,3 +22,6 @@ class SalaryReportModel(BaseModel):
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
     employee: Mapped["EmployeeModel"] = relationship(back_populates="salary_reports", foreign_keys=[employee_id])
+
+    def __repr__(self):
+        return f"<Salary Report of {self.employee} for {self.month}>"
