@@ -6,3 +6,12 @@ from schemas.position import (
     PositionListItemSchema,
     PositionListItemSchema
 )
+from schemas.department import (
+    DepartmentCreateSchema,
+    DepartmentDetailResponseSchema,
+    DepartmentListItemSchema,
+    DepartmentListResponseSchema
+)
+from schemas.employee import (
+    EmployeeListItemSchema
+)

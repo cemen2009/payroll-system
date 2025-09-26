@@ -34,11 +34,17 @@ class EmployeeModel(BaseModel):
     position_id: Mapped[int] = mapped_column(ForeignKey("positions.id"))
     position: Mapped["PositionModel"] = relationship("PositionModel", back_populates="employees")
 
-    work_reports: Mapped[list["WorkReportModel"]] = relationship("WorkReportModel", back_populates="employee")
+    work_reports: Mapped[list["WorkReportModel"]] = relationship(
+        "WorkReportModel", back_populates="employee"
+    )
 
-    salary_reports: Mapped[list["SalaryReportModel"]] = relationship("SalaryReportModel", back_populates="employee")
+    salary_reports: Mapped[list["SalaryReportModel"]] = relationship(
+        "SalaryReportModel", back_populates="employee"
+    )
 
-    vacations: Mapped[list["VacationModel"]] = relationship("VacationModel", back_populates="employee")
+    vacations: Mapped[list["VacationModel"]] = relationship(
+        "VacationModel", back_populates="employee"
+    )
 
     def __repr__(self):
         return f"<Employee #{self.tab_number} [{self.position}]>"

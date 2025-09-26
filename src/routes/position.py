@@ -1,10 +1,12 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Depends, Path, Body, HTTPException, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from starlette import status
 
 from database.models import PositionModel
@@ -23,9 +25,9 @@ router = APIRouter()
 @router.get(
     "/positions/",
     response_model=PositionListResponseSchema,
-    summary="Get all positions from the database"
+    summary="Get all positions from the database."
 )
-async def get_position_list(
+async def read_position_list(
         request: Request,
         page: Annotated[int, Query(ge=1, description="Page number (1-based index)")] = 1,
         per_page: Annotated[int, Query(ge=1, le=20, description="Number of items per page")] = 10,
@@ -58,7 +60,7 @@ async def get_position_list(
     if not positions:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No positions was found."
+            detail=f"No positions was found on page {page}."
         )
 
     positions_list = [PositionListItemSchema.model_validate(position) for position in positions]
@@ -82,21 +84,34 @@ async def get_position_list(
     return response
 
 
-# @router.get(
-#     "/positions/{position_id}/",
-#     response_model=PositionDetailResponseSchema
-# )
-# async def get_position_detail(
-#         position_id: Annotated[int, Path()],
-#         db: AsyncSession = Depends(get_db)
-# ):
-#     ...
+@router.get(
+    "/positions/{position_id}/",
+    response_model=PositionDetailResponseSchema,
+    summary="Get a position with specified ID."
+)
+async def read_position_detail(
+        position_id: Annotated[int, Path(ge=1)],
+        db: AsyncSession = Depends(get_db)
+):
+    stmt = select(PositionModel).options(
+        selectinload(PositionModel.employees),
+    ).where(PositionModel.id == position_id)
+    result = await db.execute(stmt)
+    position = result.scalar_one_or_none()
+
+    if position is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Position with specified ID was not found."
+        )
+
+    return position
 
 
 @router.post(
     "/positions/",
     response_model=PositionDetailResponseSchema,
-    summary="Create new position with rate ($/hour) and save it into the database"
+    summary="Create new position with rate ($/hour)."
 )
 async def create_position(
         data: Annotated[PositionCreateSchema, Body()],
@@ -123,6 +138,36 @@ async def create_position(
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Wrong input data."
         )
+
+
+@router.delete(
+    "/positions/{position_id}/",
+    summary="Delete a position with specific ID."
+)
+async def remove_position(
+        position_id: Annotated[int, Path(ge=1)],
+        db: AsyncSession = Depends(get_db)
+):
+    stmt = select(PositionModel).where(PositionModel.id == position_id)
+    result = await db.execute(stmt)
+    position = result.scalar_one_or_none()
+
+    if position is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Position with specified ID was not found."
+        )
+
+    await db.delete(position)
+    await db.commit()
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": f"Position #{position_id} was deleted successfully."}
+    )
+
+
+# TODO: implement PUT endpoint

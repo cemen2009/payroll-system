@@ -1,12 +1,32 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from schemas.employee import EmployeeListItemSchema
 
 
 class DepartmentBaseSchema(BaseModel):
     name: str
+    code: str
 
 
-class DepartmentDetailResponseSchema(BaseModel):
+class DepartmentDetailResponseSchema(DepartmentBaseSchema):
     id: int
-    chief: EmployeeListItemSchema
+    chief: EmployeeListItemSchema | None
+    employees: list[EmployeeListItemSchema]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DepartmentListItemSchema(DepartmentBaseSchema):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DepartmentListResponseSchema(BaseModel):
+    departments: list[DepartmentListItemSchema]
+    total_departments: int
+    total_pages: int
+    next_page: str | None
+    previous_page: str | None
+
+
+class DepartmentCreateSchema(DepartmentBaseSchema):
+    chief_id: int | None

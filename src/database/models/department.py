@@ -11,7 +11,7 @@ class DepartmentModel(BaseModel):
     name: Mapped[str] = mapped_column(String(255))
     code: Mapped[str] = mapped_column(String(255), unique=True)
 
-    chief_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), unique=True)
+    chief_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), unique=True, nullable=True)
     chief: Mapped["EmployeeModel"] = relationship(
         foreign_keys=[chief_id],
         # that's a kludge, because chief is also an employee, so it creates a cycle reference
@@ -24,6 +24,10 @@ class DepartmentModel(BaseModel):
         back_populates="department",
         foreign_keys="EmployeeModel.department_id"
     )
+
+    @classmethod
+    def default_order_by(cls):
+        return [DepartmentModel.name, DepartmentModel.code]
 
     def __repr__(self) -> str:
         return f"<Department {self.name} (#{self.code})>"
