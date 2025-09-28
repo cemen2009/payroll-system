@@ -11,7 +11,7 @@ class DepartmentBaseSchema(BaseModel):
 class DepartmentDetailResponseSchema(DepartmentBaseSchema):
     id: int
     chief: EmployeeListItemSchema | None
-    employees: list[EmployeeListItemSchema]
+    employees: list[EmployeeListItemSchema] = []
 
     model_config = ConfigDict(from_attributes=True)
 
