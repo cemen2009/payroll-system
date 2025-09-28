@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette import status
 
-from database.models import DepartmentModel, EmployeeModel
+from models import DepartmentModel, EmployeeModel
 from schemas import (
     DepartmentDetailResponseSchema,
     DepartmentCreateSchema,

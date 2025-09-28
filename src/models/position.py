@@ -1,9 +1,9 @@
 from decimal import Decimal
 
-from sqlalchemy import String, Float, DECIMAL
+from sqlalchemy import String, DECIMAL
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from database.models.base import BaseModel
+from models.base import BaseModel
 
 
 class PositionModel(BaseModel):

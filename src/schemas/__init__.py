@@ -3,15 +3,21 @@ from schemas.position import (
     PositionDetailResponseSchema,
     PositionCreateSchema,
     PositionUpdateSchema,
-    PositionListItemSchema,
     PositionListItemSchema
 )
 from schemas.department import (
     DepartmentCreateSchema,
     DepartmentDetailResponseSchema,
-    DepartmentListItemSchema,
     DepartmentListResponseSchema
 )
 from schemas.employee import (
+    EmployeeDetailResponseSchema,
+    EmployeeListResponseSchema,
+    EmployeeCreateSchema,
+    EmployeeUpdateSchema
+)
+from schemas.common import (
+    PositionListItemSchema,
+    DepartmentListItemSchema,
     EmployeeListItemSchema
 )

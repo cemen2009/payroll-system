@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import Date, DECIMAL, Integer, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from database.models.base import BaseModel
+from models.base import BaseModel
 
 
 class SalaryReportModel(BaseModel):

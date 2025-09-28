@@ -4,8 +4,8 @@ from typing import Optional
 from sqlalchemy import String, Date, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from database.models.base import BaseModel
-from database.models.vacation import VacationModel
+from models.base import BaseModel
+from models.vacation import VacationModel
 
 
 class EmployeeModel(BaseModel):

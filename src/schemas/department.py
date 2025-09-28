@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from schemas.employee import EmployeeListItemSchema
+from schemas.common import EmployeeListItemSchema, DepartmentListItemSchema
 
 
 class DepartmentBaseSchema(BaseModel):
@@ -13,10 +13,6 @@ class DepartmentDetailResponseSchema(DepartmentBaseSchema):
     chief: EmployeeListItemSchema | None
     employees: list[EmployeeListItemSchema]
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class DepartmentListItemSchema(DepartmentBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 

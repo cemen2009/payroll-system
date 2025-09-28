@@ -5,9 +5,10 @@ from fastapi import FastAPI
 from routes import (
     position_router,
     department_router,
+    employee_router,
 )
 from database import engine
-from database.models import BaseModel
+from models import BaseModel
 
 
 @asynccontextmanager
@@ -29,5 +30,6 @@ app = FastAPI(
 
 api_version_prefix = "/api/v1"
 
-app.include_router(position_router, prefix=f"{api_version_prefix}/positions", tags=["positions"])
-app.include_router(department_router, prefix=f"{api_version_prefix}/departments", tags=["departments"])
+app.include_router(position_router, prefix=f"{api_version_prefix}/positions", tags=["Positions"])
+app.include_router(department_router, prefix=f"{api_version_prefix}/departments", tags=["Departments"])
+app.include_router(employee_router, prefix=f"{api_version_prefix}/employees", tags=["Employees"])

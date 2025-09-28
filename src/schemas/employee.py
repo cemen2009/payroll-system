@@ -1,6 +1,12 @@
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+from schemas.common import (
+    PositionListItemSchema,
+    DepartmentListItemSchema,
+    EmployeeListItemSchema
+)
 
 
 class EmployeeBaseSchema(BaseModel):
@@ -15,20 +21,23 @@ class EmployeeBaseSchema(BaseModel):
     termination_date: date | None
 
 
-class EmployeeListItemSchema(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    department: str | None
+class EmployeeDetailResponseSchema(EmployeeBaseSchema):
+    department: DepartmentListItemSchema | None
+    position: PositionListItemSchema
 
-    # TODO: add amount of work&salary reports
+    # vacations: list[VacationListItemSchema]
+    # work_reports: list[WorkReportListItemSchema]
+    # salary_reports: list[SalaryReportsListItemSchema]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
-class EmployeeDetailResponseSchema(BaseModel):
-    id: int
-
-    department: str | None
-    position: str
+class EmployeeListResponseSchema(BaseModel):
+    employees: list[EmployeeListItemSchema]
+    next_page: str | None
+    previous_page: str | None
+    total_employees: int
+    total_pages: int
 
 
 class EmployeeCreateSchema(EmployeeBaseSchema):

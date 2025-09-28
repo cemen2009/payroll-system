@@ -1,7 +1,7 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from database.models.base import BaseModel
+from models.base import BaseModel
 
 
 class DepartmentModel(BaseModel):

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette import status
 
-from database.models import PositionModel
+from models import PositionModel
 from schemas import (
     PositionListResponseSchema,
     PositionDetailResponseSchema,

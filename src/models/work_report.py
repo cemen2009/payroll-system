@@ -5,7 +5,7 @@ from sqlalchemy import Date, Integer, ForeignKey
 from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.models.base import BaseModel
+from models.base import BaseModel
 
 
 class WorkingDayType(Enum):

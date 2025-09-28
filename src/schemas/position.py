@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
-from schemas.employee import EmployeeListItemSchema
+from schemas.common import PositionListItemSchema, EmployeeListItemSchema
 
 
 class PositionBaseSchema(BaseModel):
@@ -14,10 +14,6 @@ class PositionDetailResponseSchema(PositionBaseSchema):
     id: int
     employees: list[EmployeeListItemSchema]
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class PositionListItemSchema(PositionBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
