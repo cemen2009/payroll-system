@@ -8,8 +8,8 @@ class DepartmentModel(BaseModel):
     __tablename__ = "departments"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(255))
-    code: Mapped[str] = mapped_column(String(255), unique=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)  # add index to name ?
+    code: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     chief_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), unique=True, nullable=True)
     chief: Mapped["EmployeeModel"] = relationship(

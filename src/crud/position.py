@@ -4,27 +4,21 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from models import PositionModel
-from schemas import PositionListItemSchema, PositionCreateSchema, PositionUpdateSchema
+from models import PositionModel, EmployeeModel
+from schemas import PositionListItemResponseSchema, PositionCreateRequestSchema, PositionUpdateRequestSchema
 
 
 async def fetch_position_by_id(position_id: int, db: AsyncSession) -> PositionModel:
     stmt = select(PositionModel).options(
-        selectinload(PositionModel.employees),
+        selectinload(PositionModel.employees).selectinload(EmployeeModel.department),
     ).where(PositionModel.id == position_id)
     result = await db.execute(stmt)
     position = result.scalar_one_or_none()
 
-    if position is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Position with specified ID was not found."
-        )
-
     return position
 
 
-async def fetch_positions(offset: int, limit: int, db: AsyncSession) -> list[PositionListItemSchema]:
+async def fetch_positions(offset: int, limit: int, db: AsyncSession) -> list[PositionListItemResponseSchema]:
     order_by: list = PositionModel.default_order_by()  # a list with ordering settings for model
     stmt = select(PositionModel)
 
@@ -37,17 +31,11 @@ async def fetch_positions(offset: int, limit: int, db: AsyncSession) -> list[Pos
     result_positions = await db.execute(stmt)
     positions = result_positions.scalars().all()
 
-    if not positions:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No positions was found on page {limit}."
-        )
-
-    return [PositionListItemSchema.model_validate(position) for position in positions]
+    return [PositionListItemResponseSchema.model_validate(position) for position in positions]
 
 
 async def create_position_entity(
-        position_data: PositionCreateSchema,
+        position_data: PositionCreateRequestSchema,
         db: AsyncSession
 ) -> PositionModel:
     existing_stmt = select(PositionModel).where(PositionModel.title == position_data.title)
@@ -76,14 +64,9 @@ async def create_position_entity(
         )
 
 
-async def update_position_entity(update_data: PositionUpdateSchema, db: AsyncSession) -> None:
-    ...
-
-
-async def delete_position_entity(position_id: int, db: AsyncSession) -> None:
+async def update_position_entity(position_id: int, update_data: PositionUpdateRequestSchema, db: AsyncSession) -> None:
     stmt = select(PositionModel).where(PositionModel.id == position_id)
-    result = await db.execute(stmt)
-    position = result.scalar_one_or_none()
+    position = (await db.execute(stmt)).scalar_one_or_none()
 
     if position is None:
         raise HTTPException(
@@ -91,5 +74,26 @@ async def delete_position_entity(position_id: int, db: AsyncSession) -> None:
             detail="Position with specified ID was not found."
         )
 
-    await db.delete(position)
-    await db.commit()
+    if update_data.title:
+        # check if exists position with the same title
+        stmt = select(PositionModel).where(PositionModel.title == update_data.title)
+        same_title_position: PositionModel | None = (await db.execute(stmt)).scalar_one_or_none()
+
+        if same_title_position:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"A position with title {update_data.title} already exists."
+            )
+
+    for field, value in update_data.model_dump(exclude_unset=True).items():
+        setattr(position, field, value)
+
+    try:
+        await db.commit()
+        await db.refresh(position, ["employees"])
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Wrong input data."
+        )

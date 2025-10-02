@@ -1,23 +1,38 @@
 from schemas.position import (
     PositionListResponseSchema,
     PositionDetailResponseSchema,
-    PositionCreateSchema,
-    PositionUpdateSchema,
-    PositionListItemSchema
+    PositionCreateRequestSchema,
+    PositionUpdateRequestSchema,
+    PositionListItemResponseSchema
 )
 from schemas.department import (
-    DepartmentCreateSchema,
+    DepartmentCreateRequestSchema,
     DepartmentDetailResponseSchema,
-    DepartmentListResponseSchema
+    DepartmentListResponseSchema,
+    DepartmentUpdateRequestSchema,
 )
 from schemas.employee import (
     EmployeeDetailResponseSchema,
     EmployeeListResponseSchema,
-    EmployeeCreateSchema,
-    EmployeeUpdateSchema
+    EmployeeCreateRequestSchema,
+    EmployeeUpdateRequestSchema
 )
 from schemas.common import (
-    PositionListItemSchema,
-    DepartmentListItemSchema,
-    EmployeeListItemSchema
+    PositionListItemResponseSchema,
+    DepartmentListItemResponseSchema,
+    EmployeeListItemResponseSchema
+)
+from schemas.vacation import (
+    VacationListItemResponseSchema,
+    VacationCreateRequestSchema,
+    VacationUpdateRequestSchema,
+    VacationListResponseSchema,
+    VacationDetailResponseSchema,
+)
+from schemas.salary_report import (
+    SalaryReportCreateRequestSchema,
+    SalaryReportDetailResponseSchema,
+    SalaryReportListItemResponseSchema,
+    SalaryReportUpdateRequestSchema,
+    SalaryReportListResponseSchema
 )

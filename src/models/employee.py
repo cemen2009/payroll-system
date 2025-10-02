@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import String, Date, ForeignKey
+from sqlalchemy import String, Date, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from models.base import BaseModel
@@ -12,13 +12,13 @@ class EmployeeModel(BaseModel):
     __tablename__ = "employees"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    tab_number: Mapped[int] = mapped_column(unique=True, info={
+    tab_number: Mapped[int] = mapped_column(Integer, unique=True, index=True, info={
         "tip": "Unique tab number of an employee"
     })
     first_name: Mapped[str] = mapped_column(String(255))
     last_name: Mapped[str] = mapped_column(String(255))
     middle_name: Mapped[str] = mapped_column(String(255), nullable=True)
-    social_security_number: Mapped[int] = mapped_column(unique=True)
+    social_security_number: Mapped[int] = mapped_column(Integer, unique=True, index=True)
     birth_date: Mapped[date] = mapped_column(Date)
     address: Mapped[str] = mapped_column(String(255))
     hire_date: Mapped[date] = mapped_column(Date)

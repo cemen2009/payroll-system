@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum, auto
 
-from sqlalchemy import Date, Integer, ForeignKey
+from sqlalchemy import Date, Integer, ForeignKey, CheckConstraint
 from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,10 +23,14 @@ class WorkReportModel(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     work_date: Mapped[date] = mapped_column(
-        Date, info={"tip": "Report will be saved for this day"}
+        Date, nullable=False, info={"tip": "Report will be saved for this day"}
     )
-    day_type: Mapped[WorkingDayType] = mapped_column(EnumType(WorkingDayType))
-    hours_worked: Mapped[int] = mapped_column(Integer)
+    day_type: Mapped[WorkingDayType] = mapped_column(EnumType(WorkingDayType), nullable=False)
+    hours_worked: Mapped[int] = mapped_column(
+        Integer,
+        CheckConstraint("hours_worked >= 0 AND hours_worked <= 24"),
+        nullable=False
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
     employee: Mapped["EmployeeModel"] = relationship(
@@ -34,4 +38,4 @@ class WorkReportModel(BaseModel):
     )
 
     def __repr__(self):
-        return f"<Work Report of {self.employee} for {self.work_date}>"
+        return f"<Work Report of Employee #{self.employee_id} for {self.work_date}>"

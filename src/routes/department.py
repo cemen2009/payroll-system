@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Depends, Request, Body
+from fastapi import APIRouter, Path, Depends, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -10,13 +10,15 @@ from crud import (
     fetch_department_by_id,
     fetch_departments,
     create_department_entity,
-    delete_department_entity,
+    update_department_entity,
+    delete_entity
 )
+from exceptions import NotFoundEntityException
 from models import DepartmentModel
 from schemas import (
     DepartmentDetailResponseSchema,
-    DepartmentCreateSchema,
-    DepartmentListResponseSchema,
+    DepartmentCreateRequestSchema,
+    DepartmentListResponseSchema, DepartmentUpdateRequestSchema,
 )
 from database import get_db
 
@@ -30,30 +32,25 @@ router = APIRouter()
     summary="Get all departments with specified pagination."
 )
 async def get_department_list(
-        request: Request,
-        per_page: Annotated[int, Path(ge=1, le=20)] = 10,
-        page: Annotated[int, Path(ge=1)] = 1,
+        per_page: Annotated[int, Query(ge=1, le=20)] = 10,
+        page: Annotated[int, Query(ge=1)] = 1,
         db: AsyncSession = Depends(get_db)
 ):
     offset = (page - 1) * per_page
 
     total_departments = await count_entities(DepartmentModel, db)
+
+    if not total_departments:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No departments were found."
+        )
+
     departments_list = await fetch_departments(offset, per_page, db)
-
-    total_pages = (total_departments + per_page - 1) // per_page
-
-    url_path = request.url
-    query_base = f"{url_path}?per_page={per_page}"
-
-    prev_page = f"{query_base}&page={page - 1}" if page > 1 else None
-    next_page = f"{query_base}&page={page + 1}" if page < total_pages else None
 
     response = DepartmentListResponseSchema(
         departments=departments_list,
-        total_departments=total_departments,
-        total_pages=total_pages,
-        next_page=next_page,
-        previous_page=prev_page
+        total=total_departments
     )
 
     return response
@@ -78,26 +75,42 @@ async def get_department_detail(
     summary="Create a new department."
 )
 async def create_department(
-        department_data: Annotated[DepartmentCreateSchema, Body()],
+        department_data: Annotated[DepartmentCreateRequestSchema, Body()],
         db: AsyncSession = Depends(get_db)
 ):
     new_department = await create_department_entity(department_data, db)
     return new_department
 
 
+@router.patch(
+    "/departments/{department_id}/",
+    status_code=status.HTTP_200_OK,
+    summary="Update a department with specific ID."
+)
+async def update_department(
+        department_id: Annotated[int, Path(ge=1)],
+        update_data: Annotated[DepartmentUpdateRequestSchema, Body()],
+        db: AsyncSession = Depends(get_db),
+):
+    await update_department_entity(department_id, update_data, db)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": f"Department #{department_id} was updated successfully."}
+    )
+
+
 @router.delete(
-    "/department/{department_id}/",
+    "/departments/{department_id}/",
     summary="Delete a department with specific ID."
 )
 async def remove_department(
     department_id: Annotated[int, Path(ge=1)],
     db: AsyncSession = Depends(get_db)
 ):
-    await delete_department_entity(department_id, db)
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"message": f"Department #{department_id} was deleted successfully."}
-    )
-
-
-# TODO: implement PUT endpoint
+    try:
+        await delete_entity(DepartmentModel, department_id, db)
+    except NotFoundEntityException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No department was found."
+        )

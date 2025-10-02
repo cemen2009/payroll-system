@@ -4,7 +4,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
-from schemas import EmployeeListItemSchema, EmployeeCreateSchema
+from schemas import EmployeeListItemResponseSchema, EmployeeCreateRequestSchema, EmployeeUpdateRequestSchema
 from models import EmployeeModel, PositionModel, DepartmentModel
 
 
@@ -30,7 +30,7 @@ async def fetch_employee_by_id(employee_id: int, db: AsyncSession) -> EmployeeMo
     return employee
 
 
-async def fetch_employees(offset: int, limit: int, db: AsyncSession) -> list[EmployeeListItemSchema]:
+async def fetch_employees(offset: int, limit: int, db: AsyncSession) -> list[EmployeeListItemResponseSchema]:
     order_by: list = EmployeeModel.default_order_by()
     stmt = select(EmployeeModel).options(
         selectinload(EmployeeModel.department),
@@ -50,12 +50,12 @@ async def fetch_employees(offset: int, limit: int, db: AsyncSession) -> list[Emp
             detail=f"No employees was found on page {limit}"
         )
 
-    employees_list = [EmployeeListItemSchema.model_validate(employee) for employee in employees]
+    employees_list = [EmployeeListItemResponseSchema.model_validate(employee) for employee in employees]
 
     return employees_list
 
 
-async def create_employee_entity(employee_data: EmployeeCreateSchema, db: AsyncSession) -> EmployeeModel:
+async def create_employee_entity(employee_data: EmployeeCreateRequestSchema, db: AsyncSession) -> EmployeeModel:
     stmt = select(EmployeeModel).where(
         or_(
             EmployeeModel.tab_number == employee_data.tab_number,
@@ -116,14 +116,10 @@ async def create_employee_entity(employee_data: EmployeeCreateSchema, db: AsyncS
         )
 
 
-# async def update_employee_entity(update_data: EmployeeUpdateSchema, db: AsyncSession) -> None:
-#     ...
-
-
-async def delete_employee_entity(employee_id: int, db: AsyncSession) -> None:
+async def update_employee_entity(employee_id: int, update_data: EmployeeUpdateRequestSchema, db: AsyncSession) -> None:
     stmt = select(EmployeeModel).where(EmployeeModel.id == employee_id)
-    result = await db.execute(stmt)
-    employee = result.scalar_one_or_none()
+    employee_result = await db.execute(stmt)
+    employee = employee_result.scalar_one_or_none()
 
     if employee is None:
         raise HTTPException(
@@ -131,5 +127,18 @@ async def delete_employee_entity(employee_id: int, db: AsyncSession) -> None:
             detail="Employee with specified ID was not found."
         )
 
-    await db.delete(employee)
-    await db.commit()
+    for field, value in update_data.model_dump(exclude_unset=True).items():
+        setattr(employee, field, value)
+
+    try:
+        await db.commit()
+        await db.refresh(
+            employee,
+            ["position", "department", "vacations", "salary_reports", "work_reports"]
+        )
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Wrong input data."
+        )

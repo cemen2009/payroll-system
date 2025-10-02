@@ -15,8 +15,8 @@ class VacationModel(BaseModel):
     __tablename__ = "vacations"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    start_date: Mapped[date] = mapped_column(Date)
-    end_date: Mapped[date] = mapped_column(Date)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
     employee: Mapped["EmployeeModel"] = relationship("EmployeeModel", back_populates="vacations")

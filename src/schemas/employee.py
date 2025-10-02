@@ -1,11 +1,11 @@
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from schemas.common import (
-    PositionListItemSchema,
-    DepartmentListItemSchema,
-    EmployeeListItemSchema
+    PositionListItemResponseSchema,
+    DepartmentListItemResponseSchema,
+    EmployeeListItemResponseSchema
 )
 
 
@@ -20,10 +20,17 @@ class EmployeeBaseSchema(BaseModel):
     hire_date: date
     termination_date: date | None
 
+    @field_validator("termination_date")
+    @classmethod
+    def validate_termination_date(cls, v: date | None, info) -> date | None:
+        if v is not None and v < info.data["hire_date"]:
+            raise ValueError("Hire date must be before termination date")
+        return v
+
 
 class EmployeeDetailResponseSchema(EmployeeBaseSchema):
-    department: DepartmentListItemSchema | None
-    position: PositionListItemSchema
+    department: DepartmentListItemResponseSchema | None
+    position: PositionListItemResponseSchema
 
     # vacations: list[VacationListItemSchema]
     # work_reports: list[WorkReportListItemSchema]
@@ -33,18 +40,25 @@ class EmployeeDetailResponseSchema(EmployeeBaseSchema):
 
 
 class EmployeeListResponseSchema(BaseModel):
-    employees: list[EmployeeListItemSchema]
-    next_page: str | None
-    previous_page: str | None
-    total_employees: int
-    total_pages: int
+    employees: list[EmployeeListItemResponseSchema]
+    total: int
 
 
-class EmployeeCreateSchema(EmployeeBaseSchema):
+class EmployeeCreateRequestSchema(EmployeeBaseSchema):
     department_id: int | None
     position_id: int
 
 
-class EmployeeUpdateSchema(EmployeeBaseSchema):
-    department_id: int | None
-    position_id: int
+class EmployeeUpdateRequestSchema(BaseModel):
+    tab_number: int | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    middle_name: str | None = None
+    social_security_number: int | None = None
+    birth_date: date | None = None
+    address: str | None = None
+    hire_date: date | None = None
+    termination_date: date | None = None
+
+    department_id: int | None = None
+    position_id: int | None = None

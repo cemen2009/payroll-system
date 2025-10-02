@@ -1,10 +1,12 @@
+# this file was created to avoid circular import
+
 from datetime import date
 from decimal import Decimal
 
 from pydantic import ConfigDict, BaseModel
 
 
-class PositionListItemSchema(BaseModel):
+class PositionListItemResponseSchema(BaseModel):
     id: int
     title: str
     rate: Decimal
@@ -12,7 +14,7 @@ class PositionListItemSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class DepartmentListItemSchema(BaseModel):
+class DepartmentListItemResponseSchema(BaseModel):
     id: int
     name: str
     code: str
@@ -20,14 +22,14 @@ class DepartmentListItemSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class EmployeeListItemSchema(BaseModel):
+class EmployeeListItemResponseSchema(BaseModel):
     id: int
     tab_number: int
     first_name: str
     last_name: str
     termination_date: date | None
 
-    department: DepartmentListItemSchema | None
-    position: PositionListItemSchema
+    department: DepartmentListItemResponseSchema | None
+    position: PositionListItemResponseSchema
 
     model_config = ConfigDict(from_attributes=True)
