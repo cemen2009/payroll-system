@@ -46,5 +46,9 @@ class EmployeeModel(BaseModel):
         "VacationModel", back_populates="employee"
     )
 
+    @classmethod
+    def default_order_by(cls):
+        return [cls.last_name.asc(), cls.hire_date.desc()]
+
     def __repr__(self):
         return f"<Employee #{self.tab_number} [{self.position}]>"

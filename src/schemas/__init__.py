@@ -36,3 +36,17 @@ from schemas.salary_report import (
     SalaryReportUpdateRequestSchema,
     SalaryReportListResponseSchema
 )
+from schemas.work_report import (
+    WorkReportCreateRequestSchema,
+    WorkReportDetailResponseSchema,
+    WorkReportListItemResponseSchema,
+    WorkReportUpdateRequestSchema,
+    WorkReportListResponseSchema
+)
+from schemas.salary_report import (
+    SalaryReportCreateRequestSchema,
+    SalaryReportDetailResponseSchema,
+    SalaryReportListItemResponseSchema,
+    SalaryReportUpdateRequestSchema,
+    SalaryReportListResponseSchema
+)

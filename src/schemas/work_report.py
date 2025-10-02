@@ -1,14 +1,15 @@
 from datetime import date
 
-from pydantic import BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel, field_validator, ConfigDict, Field
 
 from models.work_report import WorkingDayType
 from schemas import EmployeeListItemResponseSchema
+from schemas.employee import EmployeeBaseSchema
 
 
 class WorkReportBaseSchema(BaseModel):
     work_date: date
-    day_type: WorkingDayType
+    day_type: WorkingDayType = Field(..., description="Type of working day: weekday, weekend, holiday")
     hours_worked: int
 
     @field_validator("hours_worked")
@@ -32,7 +33,7 @@ class WorkReportListResponseSchema(BaseModel):
 
 class WorkReportDetailResponseSchema(WorkReportBaseSchema):
     id: int
-    employee: EmployeeListItemResponseSchema
+    employee: EmployeeBaseSchema
 
     model_config = ConfigDict(from_attributes=True)
 

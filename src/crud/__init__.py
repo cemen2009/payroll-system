@@ -22,4 +22,10 @@ from crud.vacation import (
     create_vacation_entity,
     update_vacation_entity
 )
+from crud.work_report import (
+    fetch_work_report,
+    fetch_work_reports,
+    create_work_report_entity,
+    update_work_report_entity,
+)
 from crud.common import count_entities, delete_entity

@@ -13,7 +13,7 @@ class EmployeeBaseSchema(BaseModel):
     tab_number: int
     first_name: str
     last_name: str
-    middle_name: str
+    middle_name: str | None
     social_security_number: int
     birth_date: date
     address: str

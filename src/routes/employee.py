@@ -70,7 +70,7 @@ async def get_employee_detail(
 
 
 @router.post(
-    "/employee/",
+    "/employees/",
     response_model=EmployeeDetailResponseSchema,
     status_code=status.HTTP_201_CREATED,
     summary="Create an employee with required position."
@@ -84,7 +84,7 @@ async def create_employee(
 
 
 @router.patch(
-    "/employee/{employee_id}/",
+    "/employees/{employee_id}/",
     summary="Update an employee with required position."
 )
 async def update_employee(
@@ -100,7 +100,7 @@ async def update_employee(
 
 
 @router.delete(
-    "/employee/{employee_id}",
+    "/employees/{employee_id}",
     status_code=status.HTTP_200_OK,
     summary="Delete an employee with specified ID."
 )

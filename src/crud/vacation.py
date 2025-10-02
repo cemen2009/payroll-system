@@ -81,6 +81,8 @@ async def create_vacation_entity(
         )
 
     active_vacations_percentage = await calculate_vacations_percentage(employee.department_id, db)
+    print(f"DEBUG: active vacation percentage {active_vacations_percentage}%")
+    print(f"DEBUG: checking vacation availability {active_vacations_percentage}% >= {VACATION_LIMIT_PERCENTAGE}%")
     if active_vacations_percentage >= VACATION_LIMIT_PERCENTAGE:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

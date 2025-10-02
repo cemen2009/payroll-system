@@ -44,12 +44,6 @@ async def fetch_employees(offset: int, limit: int, db: AsyncSession) -> list[Emp
     employees_result = await db.execute(stmt)
     employees = employees_result.scalars().all()
 
-    if not employees:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No employees was found on page {limit}"
-        )
-
     employees_list = [EmployeeListItemResponseSchema.model_validate(employee) for employee in employees]
 
     return employees_list
