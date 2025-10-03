@@ -2,6 +2,8 @@ from models.position import PositionModel
 from models.department import DepartmentModel
 from models.employee import EmployeeModel
 from models.work_report import WorkReportModel
-from models.salary_report import SalaryReportModel
 from models.vacation import VacationModel
 from models.base import BaseModel
+from models.payroll_run import PayrollRunModel
+from models.payment import PaymentModel
+from models.salary_line import SalaryLineModel

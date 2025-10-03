@@ -28,4 +28,15 @@ from crud.work_report import (
     create_work_report_entity,
     update_work_report_entity,
 )
+from crud.payroll_run import (
+    fetch_payroll_by_id,
+    create_payroll_run_entity,
+    fetch_payrolls,
+    approve_payroll_run_entity
+)
+from crud.payment import (
+    fetch_payments,
+    fetch_payment_by_id,
+    create_payment_entity,
+)
 from crud.common import count_entities, delete_entity

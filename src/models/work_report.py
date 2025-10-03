@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
 
-from sqlalchemy import Date, Integer, ForeignKey, CheckConstraint
+from sqlalchemy import Date, Integer, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy import Enum as PgEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -43,6 +43,10 @@ class WorkReportModel(BaseModel):
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), nullable=False)
     employee: Mapped["EmployeeModel"] = relationship(
         "EmployeeModel", back_populates="work_reports", foreign_keys=[employee_id]
+    )
+
+    __table_args__ = (
+        UniqueConstraint("employee_id", "work_date", name="uq_employee_date"),
     )
 
     @classmethod

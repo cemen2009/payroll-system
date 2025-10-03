@@ -8,6 +8,8 @@ from routes import (
     employee_router,
     vacation_router,
     work_report_router,
+    payroll_run_router,
+    payment_router
 )
 from database import engine
 from models import BaseModel
@@ -37,3 +39,5 @@ app.include_router(department_router, prefix=f"{api_version_prefix}/departments"
 app.include_router(employee_router, prefix=f"{api_version_prefix}/employees", tags=["Employees"])
 app.include_router(vacation_router, prefix=f"{api_version_prefix}/vacations", tags=["Vacations"])
 app.include_router(work_report_router, prefix=f"{api_version_prefix}/work_reports", tags=["Work Reports"])
+app.include_router(payroll_run_router, prefix=f"{api_version_prefix}/payrolls", tags=["Payroll Runs"])
+app.include_router(payment_router, prefix=f"{api_version_prefix}/payments", tags=["Payments"])

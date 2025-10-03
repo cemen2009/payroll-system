@@ -38,12 +38,16 @@ class EmployeeModel(BaseModel):
         "WorkReportModel", back_populates="employee"
     )
 
-    salary_reports: Mapped[list["SalaryReportModel"]] = relationship(
-        "SalaryReportModel", back_populates="employee"
+    salary_reports: Mapped[list["SalaryLineModel"]] = relationship(
+        "SalaryLineModel", back_populates="employee"
     )
 
     vacations: Mapped[list["VacationModel"]] = relationship(
         "VacationModel", back_populates="employee"
+    )
+
+    payments: Mapped[list["PaymentModel"]] = relationship(
+        "PaymentModel", back_populates="employee"
     )
 
     @classmethod

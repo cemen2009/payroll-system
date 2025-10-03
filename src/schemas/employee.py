@@ -34,7 +34,6 @@ class EmployeeDetailResponseSchema(EmployeeBaseSchema):
 
     # vacations: list[VacationListItemSchema]
     # work_reports: list[WorkReportListItemSchema]
-    # salary_reports: list[SalaryReportsListItemSchema]
 
     model_config = ConfigDict(from_attributes=True)
 

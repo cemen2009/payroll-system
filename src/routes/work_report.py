@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Body, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import JSONResponse
 
 from crud import count_entities, delete_entity
 from crud import (
@@ -130,6 +131,11 @@ async def update_work_report(
             status_code=status.HTTP_409_CONFLICT,
             detail=e.msg
         )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"detail": f"Work Report #{report_id} was updated successfully."}
+    )
 
 
 @router.delete(

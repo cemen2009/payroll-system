@@ -29,13 +29,6 @@ from schemas.vacation import (
     VacationListResponseSchema,
     VacationDetailResponseSchema,
 )
-from schemas.salary_report import (
-    SalaryReportCreateRequestSchema,
-    SalaryReportDetailResponseSchema,
-    SalaryReportListItemResponseSchema,
-    SalaryReportUpdateRequestSchema,
-    SalaryReportListResponseSchema
-)
 from schemas.work_report import (
     WorkReportCreateRequestSchema,
     WorkReportDetailResponseSchema,
@@ -43,10 +36,10 @@ from schemas.work_report import (
     WorkReportUpdateRequestSchema,
     WorkReportListResponseSchema
 )
-from schemas.salary_report import (
-    SalaryReportCreateRequestSchema,
-    SalaryReportDetailResponseSchema,
-    SalaryReportListItemResponseSchema,
-    SalaryReportUpdateRequestSchema,
-    SalaryReportListResponseSchema
+from schemas.payroll_run import PayrollRunListItemSchema, PayrollRunListResponseSchema, PayrollRunDetailResponseSchema
+from schemas.payment import (
+    PaymentCreateRequestSchema,
+    PaymentListResponseSchema,
+    PaymentListItemResponseSchema,
+    PaymentDetailResponseSchema
 )

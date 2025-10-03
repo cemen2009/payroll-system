@@ -11,7 +11,11 @@ class PositionModel(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
-    rate: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False, info={"tip": "Rate of an employee per hour"})
+    rate: Mapped[Decimal] = mapped_column(
+        DECIMAL(10, 2),
+        nullable=False,
+        info={"tip": "Rate of an employee per hour"}
+    )
 
     employees: Mapped[list["EmployeeModel"]] = relationship(
         "EmployeeModel",

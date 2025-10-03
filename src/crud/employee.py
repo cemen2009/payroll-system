@@ -14,7 +14,6 @@ async def fetch_employee_by_id(employee_id: int, db: AsyncSession) -> EmployeeMo
         selectinload(EmployeeModel.position),
         selectinload(EmployeeModel.work_reports),
         selectinload(EmployeeModel.work_reports),
-        selectinload(EmployeeModel.salary_reports),
         selectinload(EmployeeModel.vacations),
     ).where(EmployeeModel.id == employee_id)
 
@@ -97,7 +96,7 @@ async def create_employee_entity(employee_data: EmployeeCreateRequestSchema, db:
         await db.commit()
         await db.refresh(
             employee,
-            ["position", "department", "work_reports", "salary_reports", "vacations"]
+            ["position", "department", "work_reports", "vacations"]
         )
 
         return employee
@@ -128,7 +127,7 @@ async def update_employee_entity(employee_id: int, update_data: EmployeeUpdateRe
         await db.commit()
         await db.refresh(
             employee,
-            ["position", "department", "vacations", "salary_reports", "work_reports"]
+            ["position", "department", "vacations", "work_reports"]
         )
     except IntegrityError:
         await db.rollback()
